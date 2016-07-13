@@ -11,8 +11,6 @@ def open_and_read_file(file_path):
     # reading over the file and making it all into one big string
     contents = open(file_path).read()
     return contents
-    
-# print (open_and_read_file("green-eggs.txt"))
 
 
 def make_chains(text_string):
@@ -39,6 +37,7 @@ def make_chains(text_string):
         # Creating a bigram variable that is a tuple of a word and the following word
         bigram = (words[i], words[i+1])
         # If the tuples are in the dictionary, append the third word to the values list
+
         if bigram in chains:
             chains[bigram].append(words[i+2])
 
@@ -46,6 +45,16 @@ def make_chains(text_string):
         # word to the values list
         else:
             chains[bigram] = [words[i+2]]
+    
+    # singled out the last bigram 
+    last_bigram = (words[-2], words[-1])
+    #append nothing to the list if last bigram in dictionary     
+    if last_bigram in chains:
+        chains[last_bigram].append(None)
+    #if the last bigram is not in the dictionary 
+    else:
+        chains[last_bigram] = [None]
+
         
     return chains
 
@@ -53,33 +62,26 @@ def make_chains(text_string):
 def make_text(chains):
     """Takes dictionary of markov chains; returns random text."""
 
-    # text = [random.choice(chains.values()) for key, value in chains.items()]
-
-    # for key, value in chains.items():
-    #     return random.choice(key), value
-
-    text = ""
+    
     # get the keys from the dict and randomize
-    rndom_bigram = choice(chains.keys())
+    random_bigram = choice(chains.keys())
+    # text is starting with the first random bigram
+    text = random_bigram[0] + " " + random_bigram[1] 
 
-    while len(text) < 140:
-        # get the values from the corresponding value lists and randomize 
-        rndom_value = choice(chains[rndom_bigram])
-        
-        text = text + " " + rndom_bigram[0] + " " + rndom_bigram[1] + " " + rndom_value
-
-        #Make a new key out of the second word in the first key and the random 
-        #word you pulled out from the list of words that followed it.
-        new_key_dict = {}
-        # new_key = (rndom_bigram[1], rndom_value)
-
-        for i in text:
-            new_key_dict[i] = new_key_dict.get(rndom_bigram[1], rndom_value)
-
+    while True:
+        # we want the next word to be a random value from available values list for 
+        #the corresponding key 
+        next_word = choice(chains[random_bigram])
+        # if the next word is None, then break the while loop
+        if not next_word:
+            break
+        # adding the next word to our text
+        text = text + " " + next_word
+        # updates the random_bigram variable to be the second word of the original bigram
+        # plus the next word
+        random_bigram = (random_bigram[1], next_word)    
 
     return text
-
-
 
 
 input_path = "green-eggs.txt"
